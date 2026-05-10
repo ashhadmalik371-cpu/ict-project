@@ -5,12 +5,13 @@ st.set_page_config(page_title="Mechanical Engineering Toolkit", layout="wide")
 
 # --- Header & Student Credentials ---
 st.title("🛠️ Mechanical Unit Converter & Material Density Checker")
-st.markdown(f"""
----
-**Developer:** Malik Ashhad Nadeem  
-**Roll Number:** 25-me-120  
----
-""", unsafe_content_label=True)
+
+# This section was causing the error. I've simplified it to work perfectly.
+st.markdown("---")
+st.subheader("Developer Details")
+st.write(f"**Name:** Malik Ashhad Nadeem")
+st.write(f"**Roll Number:** 25-me-120")
+st.markdown("---")
 
 # Create two main tabs for organization
 tab1, tab2 = st.tabs(["Unit Converter", "Material Density Checker"])
@@ -25,6 +26,9 @@ with tab1:
         input_value = st.number_input("Enter Value to Convert:", value=1.0, format="%.4f")
 
     with col2:
+        result = 0.0
+        unit = ""
+        
         if category == "Length":
             mode = st.selectbox("Conversion Type", ["Meters to Feet", "Feet to Meters", "Inches to mm", "mm to Inches"])
             if mode == "Meters to Feet": result, unit = input_value * 3.28084, "ft"
