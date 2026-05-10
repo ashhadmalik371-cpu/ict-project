@@ -1,67 +1,84 @@
 import streamlit as st
-import pandas as pd
 
-# --- UI Header ---
-st.set_page_config(page_title="Mechanical Unit Converter", layout="centered")
-st.title("Mechanical Unit Converter & Material Density Checker")
+# --- Page Configuration ---
+st.set_page_config(page_title="Mechanical Engineering Toolkit", layout="wide")
 
-# Student Information Display
-st.sidebar.markdown("### Developer Details")
-st.sidebar.info(f"**Name:** Malik Ashhad Nadeem\n\n**Roll Number:** 25-me-120")
-
-# --- Section 1: Unit Converter ---
-st.header("⚙️ Mechanical Unit Converter")
-col1, col2 = st.columns(2)
-
-with col1:
-    value = st.number_input("Enter Value:", value=1.0)
-    conversion_type = st.selectbox("Select Dimension:", ["Length", "Mass", "Pressure"])
-
-with col2:
-    if conversion_type == "Length":
-        unit = st.selectbox("Convert From:", ["Meters to Feet", "Feet to Meters", "Inches to mm", "mm to Inches"])
-        if unit == "Meters to Feet": result = value * 3.28084
-        elif unit == "Feet to Meters": result = value / 3.28084
-        elif unit == "Inches to mm": result = value * 25.4
-        else: result = value / 25.4
-
-    elif conversion_type == "Mass":
-        unit = st.selectbox("Convert From:", ["kg to lbs", "lbs to kg"])
-        if unit == "kg to lbs": result = value * 2.20462
-        else: result = value / 2.20462
-
-    elif conversion_type == "Pressure":
-        unit = st.selectbox("Convert From:", ["Bar to PSI", "PSI to Bar", "Pa to kPa"])
-        if unit == "Bar to PSI": result = value * 14.5038
-        elif unit == "PSI to Bar": result = value / 14.5038
-        elif unit == "Pa to kPa": result = value / 1000
-
-st.success(f"**Result:** {result:.4f}")
-
+# --- Header & Student Credentials ---
+st.title("🛠️ Mechanical Unit Converter & Material Density Checker")
+st.markdown(f"""
 ---
+**Developer:** Malik Ashhad Nadeem  
+**Roll Number:** 25-me-120  
+---
+""", unsafe_content_label=True)
 
-# --- Section 2: Material Density Checker ---
-st.header("⚖️ Material Density Checker")
+# Create two main tabs for organization
+tab1, tab2 = st.tabs(["Unit Converter", "Material Density Checker"])
 
-# Dictionary of common engineering materials (Density in kg/m³)
-materials = {
-    "Steel": 7850,
-    "Aluminum": 2700,
-    "Copper": 8960,
-    "Brass": 8500,
-    "Titanium": 4500,
-    "Concrete": 2400,
-    "PVC": 1380,
-    "Water": 1000
-}
+with tab1:
+    st.header("📏 Mechanical Unit Converter")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        category = st.selectbox("Select Category", ["Length", "Mass", "Pressure", "Temperature"])
+        input_value = st.number_input("Enter Value to Convert:", value=1.0, format="%.4f")
 
-selected_material = st.selectbox("Select a Material:", list(materials.keys()))
-density = materials[selected_material]
+    with col2:
+        if category == "Length":
+            mode = st.selectbox("Conversion Type", ["Meters to Feet", "Feet to Meters", "Inches to mm", "mm to Inches"])
+            if mode == "Meters to Feet": result, unit = input_value * 3.28084, "ft"
+            elif mode == "Feet to Meters": result, unit = input_value / 3.28084, "m"
+            elif mode == "Inches to mm": result, unit = input_value * 25.4, "mm"
+            else: result, unit = input_value / 25.4, "in"
 
-st.write(f"The density of **{selected_material}** is approximately **{density} kg/m³**.")
+        elif category == "Mass":
+            mode = st.selectbox("Conversion Type", ["kg to lbs", "lbs to kg", "Gram to Ounce", "Ounce to Gram"])
+            if mode == "kg to lbs": result, unit = input_value * 2.20462, "lbs"
+            elif mode == "lbs to kg": result, unit = input_value / 2.20462, "kg"
+            elif mode == "Gram to Ounce": result, unit = input_value * 0.035274, "oz"
+            else: result, unit = input_value / 0.035274, "g"
 
-# Optional: Volume to Mass Calculator
-st.subheader("Mass Calculator")
-volume = st.number_input("Enter Volume (m³):", value=1.0, min_value=0.0)
-calculated_mass = volume * density
-st.info(f"Calculated Mass: **{calculated_mass:,.2f} kg**")
+        elif category == "Pressure":
+            mode = st.selectbox("Conversion Type", ["Bar to PSI", "PSI to Bar", "Pascal to kPa", "MPa to PSI"])
+            if mode == "Bar to PSI": result, unit = input_value * 14.5038, "psi"
+            elif mode == "PSI to Bar": result, unit = input_value / 14.5038, "bar"
+            elif mode == "Pascal to kPa": result, unit = input_value / 1000, "kPa"
+            else: result, unit = input_value * 145.038, "psi"
+
+        elif category == "Temperature":
+            mode = st.selectbox("Conversion Type", ["Celsius to Fahrenheit", "Fahrenheit to Celsius"])
+            if mode == "Celsius to Fahrenheit": result, unit = (input_value * 9/5) + 32, "°F"
+            else: result, unit = (input_value - 32) * 5/9, "°C"
+
+    st.metric(label="Converted Result", value=f"{result:.4f} {unit}")
+
+with tab2:
+    st.header("⚖️ Material Density Checker")
+    
+    # Standard Engineering Materials Data (kg/m^3)
+    material_db = {
+        "Steel (Mild)": 7850,
+        "Aluminum (6061)": 2700,
+        "Copper": 8960,
+        "Brass": 8500,
+        "Titanium": 4500,
+        "Cast Iron": 7200,
+        "Stainless Steel (304)": 8000,
+        "Nylon": 1150,
+        "ABS Plastic": 1040
+    }
+    
+    selected_material = st.selectbox("Select Engineering Material:", list(material_db.keys()))
+    density = material_db[selected_material]
+    
+    st.write(f"The standard density for **{selected_material}** is **{density} kg/m³**.")
+    
+    st.subheader("Quick Mass Calculator")
+    vol = st.number_input("Enter Volume of Component (m³):", min_value=0.0, value=0.1, step=0.01)
+    mass = vol * density
+    st.success(f"Total Mass: **{mass:.2f} kg**")
+
+# --- Footer ---
+st.sidebar.markdown("---")
+st.sidebar.write("Project for GitHub & Streamlit Cloud Deployment")
